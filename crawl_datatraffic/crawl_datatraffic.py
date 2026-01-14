@@ -34,7 +34,7 @@ def crawl_datatraffic(headers, cookies):
     now = datetime.now()
     try:
         while True:
-            with open('data_traffic.csv', 'r', encoding='utf-8') as csvfile:
+            with open('Crawl_DataTFHCM\Crawl_DataTFHCM\data_traffic.csv', 'r', encoding='utf-8') as csvfile:
                 reader = csv.reader(csvfile)
                 next(reader)  # Skip header row
                 for i in reader:
@@ -44,7 +44,7 @@ def crawl_datatraffic(headers, cookies):
                     resp = requests.get(url, headers=headers, cookies=cookies)
 
                     if resp.status_code == 200:
-                        with open(f"traffic_data/{now.date()}/{i[1]}_{now.hour}H{now.minute}.jpg", "wb") as f:
+                        with open(f"Crawl_DataTFHCM/Crawl_DataTFHCM/traffic_data/{now.date()}/{i[1]}_{now.hour}H{now.minute}.jpg", "wb") as f:
                             f.write(resp.content)
                         print(f"{count}. Tải OK → {i[1]}_{now.hour}:{now.minute}.jpg")
                         count += 1
@@ -70,7 +70,7 @@ def append_data_traffic_csv():
     new_id = input("\nNhập ID Camera: ")
     new_name = input("Nhập Tên Camera: ")
 
-    with open('data_traffic.csv', 'a', encoding='utf-8', newline='') as csvfile:
+    with open('Crawl_DataTFHCM\Crawl_DataTFHCM\data_traffic.csv', 'a', encoding='utf-8', newline='') as csvfile:
         writer = csv.writer(csvfile)
         # Add new camera data here if needed
         # Example:
@@ -106,8 +106,8 @@ def switch_case(headers, cookies):
                 append_data_traffic_csv()
             case 3:
                 now = datetime.now()
-                if not os.path.exists(f"traffic_data/{now.date()}"):
-                    os.mkdir(f"traffic_data/{now.date()}")
+                if not os.path.exists(f"Crawl_DataTFHCM/Crawl_DataTFHCM/traffic_data/{now.date()}"):
+                    os.mkdir(f"Crawl_DataTFHCM/Crawl_DataTFHCM/traffic_data/{now.date()}")
                     print(f"\nĐã tạo thư mục 'traffic_data/{now.date()}' thành công.\n")
                 else:
                     print(f"\nThư mục 'traffic_data/{now.date()}' đã tồn tại.\n")
