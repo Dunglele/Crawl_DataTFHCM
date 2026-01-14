@@ -4,6 +4,22 @@ import csv
 import os
 from time import sleep
 
+def introduction():
+    print("\n===================================\n")
+    print("CHƯƠNG TRÌNH CÀO DỮ LIỆU GIAO THÔNG TP.HCM\n")
+    print("===================================\n")
+    print("Cách dùng: \n")
+    print("1. Chọn '3' để tạo thư mục lưu trữ dữ liệu giao thông ngày hôm nay.\n")
+    print("2. Chọn '1' để bắt đầu cào dữ liệu giao thông.\n")
+    print("3. Chọn '2' để thêm dữ liệu camera vào file CSV nếu cần.\n")
+    print("===================================\n")
+    print("===================================\n")
+    print("\n1. Cào dữ liệu giao thông ngày hôm nay")
+    print("\n2. Thêm dữ liệu camera vào file CSV")
+    print("\n3. Tạo thư mục lưu trữ ảnh giao thông ngày hôm nay")
+    print("\n4. Thong ke so luong khu vuc kiem soat giao thong")
+    print("\n0. Thoát")
+
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
     "Accept": "image/avif,image/webp,*/*",
@@ -26,12 +42,10 @@ cookies = {
 
 def crawl_datatraffic(headers, cookies): 
     count = 1
-
     print("\n===================================\n")
     print(f"Đang tiến hành cào dữ liệu giao thông vào thời gian {datetime.now()}\n")
     print("===================================\n")
 
-    now = datetime.now()
     try:
         while True:
             with open('Crawl_DataTFHCM\Crawl_DataTFHCM\data_traffic.csv', 'r', encoding='utf-8') as csvfile:
@@ -42,7 +56,7 @@ def crawl_datatraffic(headers, cookies):
                     url = f"https://giaothong.hochiminhcity.gov.vn:8007/Render/CameraHandler.ashx?id={id_camera}&bg=black&w=640&h=480"
 
                     resp = requests.get(url, headers=headers, cookies=cookies)
-
+                    now = datetime.now()
                     if resp.status_code == 200:
                         with open(f"Crawl_DataTFHCM/Crawl_DataTFHCM/traffic_data/{now.date()}/{i[1]}_{now.hour}H{now.minute}.jpg", "wb") as f:
                             f.write(resp.content)
@@ -68,6 +82,15 @@ def crawl_datatraffic(headers, cookies):
 def append_data_traffic_csv():
 
     new_id = input("\nNhập ID Camera: ")
+    with open('Crawl_DataTFHCM\Crawl_DataTFHCM\data_traffic.csv', 'r', encoding='utf-8') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            if new_id == row[0]:
+                print(f"\nID Camera: {new_id} đã tồn tại trong file 'data_traffic.csv'. Vui lòng kiểm tra lại.\n")
+                quit = input("Bạn có muốn thử lại không? (y/n): ")
+                if quit == "y":
+                    return append_data_traffic_csv()
+                return switch_case(headers, cookies)
     new_name = input("Nhập Tên Camera: ")
 
     with open('Crawl_DataTFHCM\Crawl_DataTFHCM\data_traffic.csv', 'a', encoding='utf-8', newline='') as csvfile:
@@ -80,20 +103,18 @@ def append_data_traffic_csv():
     input("Nhấn Enter để tiếp tục...")
     return switch_case(headers, cookies)
 
+def CreateFolderSaveTF():
+    now = datetime.now()
+    if not os.path.exists(f"Crawl_DataTFHCM/Crawl_DataTFHCM/traffic_data/{now.date()}"):
+        os.mkdir(f"Crawl_DataTFHCM/Crawl_DataTFHCM/traffic_data/{now.date()}")
+        print(f"\nĐã tạo thư mục 'traffic_data/{now.date()}' thành công.\n")
+    else:
+        print(f"\nThư mục 'traffic_data/{now.date()}' đã tồn tại.\n")
+    input("Nhấn Enter để tiếp tục...")
+    return switch_case(headers, cookies)
+
 def switch_case(headers, cookies):
-    print("\n===================================\n")
-    print("CHƯƠNG TRÌNH CÀO DỮ LIỆU GIAO THÔNG TP.HCM\n")
-    print("===================================\n")
-    print("Cách dùng: \n")
-    print("1. Chọn '3' để tạo thư mục lưu trữ dữ liệu giao thông ngày hôm nay.\n")
-    print("2. Chọn '1' để bắt đầu cào dữ liệu giao thông.\n")
-    print("3. Chọn '2' để thêm dữ liệu camera vào file CSV nếu cần.\n")
-    print("===================================\n")
-    print("===================================\n")
-    print("\n1. Cào dữ liệu giao thông ngày hôm nay")
-    print("\n2. Thêm dữ liệu camera vào file CSV")
-    print("\n3. Tạo thư mục lưu trữ ảnh giao thông ngày hôm nay")
-    print("\n0. Thoát")
+    introduction()
     choice = int(input("\nNhập lựa chọn: "))
     if choice == 0:
         print("\nThoát chương trình. Tạm biệt!\n")
@@ -105,14 +126,9 @@ def switch_case(headers, cookies):
             case 2:
                 append_data_traffic_csv()
             case 3:
-                now = datetime.now()
-                if not os.path.exists(f"Crawl_DataTFHCM/Crawl_DataTFHCM/traffic_data/{now.date()}"):
-                    os.mkdir(f"Crawl_DataTFHCM/Crawl_DataTFHCM/traffic_data/{now.date()}")
-                    print(f"\nĐã tạo thư mục 'traffic_data/{now.date()}' thành công.\n")
-                else:
-                    print(f"\nThư mục 'traffic_data/{now.date()}' đã tồn tại.\n")
-                input("Nhấn Enter để tiếp tục...")
-                return switch_case(headers, cookies)
+                CreateFolderSaveTF()
+            case 4:
+                breakpoint
 
 def main():
     switch_case(headers, cookies)
